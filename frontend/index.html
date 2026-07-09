@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Gopher Reactor Simples</title>
+  <style>
+    body {
+      background: #1e1e1e;
+      color: #fff;
+      font-family: sans-serif;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      box-sizing: border-box;
+    }
+    .toolbar {
+      margin-bottom: 20px;
+      display: flex;
+      gap: 15px;
+    }
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+      background: #7c6af7;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+    button:hover {
+      background: #6a57e6;
+    }
+    video {
+      width: 100%;
+      max-width: 1200px;
+      max-height: 80vh;
+      background: #000;
+      border-radius: 8px;
+    }
+    ::cue {
+      background: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      font-size: 1.2em;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="toolbar">
+    <button onclick="selectVideo()">1. Selecionar Vídeo</button>
+    <button onclick="selectVTT()">2. Selecionar Legenda</button>
+  </div>
+
+  <video id="vid" controls crossorigin="anonymous"></video>
+
+  <script>
+    let mediaURL = "";
+
+    window.onload = function() {
+      window.go.main.App.GetMediaURL().then(url => {
+        mediaURL = url;
+      });
+    };
+
+    function selectVideo() {
+      window.go.main.App.SelectVideoFile().then(path => {
+        if (path) {
+          const vid = document.getElementById('vid');
+
+          vid.src = mediaURL + '/video?t=' + Date.now();
+          vid.play();
+        }
+      });
+    }
+
+    function selectVTT() {
+      window.go.main.App.SelectVTTFile().then(path => {
+        if (path) {
+          const vid = document.getElementById('vid');
+                    const oldTracks = vid.querySelectorAll('track');
+          oldTracks.forEach(t => t.remove());
+
+          const track = document.createElement('track');
+          track.kind = 'subtitles';
+          track.label = 'Legenda';
+          track.srclang = 'en';
+          track.src = mediaURL + '/vtt?t=' + Date.now();
+          track.default = true;
+
+          vid.appendChild(track);
+
+          const currentTime = vid.currentTime;
+          vid.currentTime = currentTime + 0.001;
+        }
+      });
+    }
+  </script>
+</body>
+</html>

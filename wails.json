@@ -1,0 +1,28 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "gopher-reactor",
+  "outputfilename": "gopher-reactor",
+  "frontend:install": "",
+  "frontend:build": "",
+  "frontend:dev:watcher": "",
+  "frontend:dev:serverUrl": "",
+  "wailsVersion": "v2.13.0",
+  "version": "2",
+  "info": {
+    "companyName": "gopher-reactor",
+    "productName": "Shadowing Player",
+    "productVersion": "1.0.0",
+    "copyright": "Copyright © 2026",
+    "comments": "Language shadowing video player"
+  },
+  "assetServer": {
+    "middleware": ""
+  },
+  "build": {
+    "nsis": false
+  },
+  "author": {
+    "name": "castle",
+    "email": ""
+  }
+}
