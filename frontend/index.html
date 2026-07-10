@@ -1,102 +1,118 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Gopher Reactor Simples</title>
-  <style>
-    body {
-      background: #1e1e1e;
-      color: #fff;
-      font-family: sans-serif;
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      height: 100vh;
-      box-sizing: border-box;
-    }
-    .toolbar {
-      margin-bottom: 20px;
-      display: flex;
-      gap: 15px;
-    }
-    button {
-      padding: 10px 15px;
-      font-size: 16px;
-      cursor: pointer;
-      background: #7c6af7;
-      color: white;
-      border: none;
-      border-radius: 5px;
-    }
-    button:hover {
-      background: #6a57e6;
-    }
-    video {
-      width: 100%;
-      max-width: 1200px;
-      max-height: 80vh;
-      background: #000;
-      border-radius: 8px;
-    }
-    ::cue {
-      background: rgba(0, 0, 0, 0.8);
-      color: #fff;
-      font-size: 1.2em;
-    }
-  </style>
+  <title>Gopher Reactor</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div class="toolbar">
-    <button onclick="selectVideo()">1. Selecionar Vídeo</button>
-    <button onclick="selectVTT()">2. Selecionar Legenda</button>
+  <div class="app-container">
+    
+    <main class="main-content" id="mainContent">
+      <div class="topbar">
+        <div></div>
+        <div class="topbar-actions">
+          <button class="btn-secondary" onclick="selectVideo()">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><polygon points="10 9 15 13 10 17 10 9"></polygon></svg>
+            Open Video
+          </button>
+          <button class="btn-secondary" onclick="selectSubtitle()">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            Open Subtitle
+          </button>
+          <button class="btn-secondary" onclick="toggleDrawer()" aria-label="Toggle Download Drawer">
+            <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Download
+          </button>
+        </div>
+      </div>
+
+      <div class="player-container">
+        <video id="vid" controls crossorigin="anonymous"></video>
+        
+        <div class="sync-overlay">
+          <button class="btn-icon" onclick="adjustSync(-0.1)" aria-label="Decrease Sync">
+            <svg class="icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          </button>
+          <input type="number" id="syncInput" class="sync-input" step="0.1" value="0.00">
+          <button class="btn-icon" onclick="adjustSync(0.1)" aria-label="Increase Sync">
+            <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          </button>
+        </div>
+
+        <div class="subtitles-overlay">
+          <div id="custom-subtitles"></div>
+        </div>
+      </div>
+    </main>
+
+    <aside class="drawer" id="sideDrawer">
+      <div class="drawer-header">
+        <h2>Download Media</h2>
+        <button class="btn-icon" onclick="toggleDrawer()" aria-label="Close Drawer">
+          <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div class="drawer-content">
+        
+        <div class="form-group">
+          <span class="label">Source URL</span>
+          <input type="text" id="videoUrl" placeholder="YouTube Video URL...">
+        </div>
+
+        <div class="form-group" style="gap: 16px;">
+          <span class="label">Destination Folder</span>
+          <div class="input-with-btn">
+            <input type="text" id="destPath" placeholder="Default (current directory)">
+            <button class="btn-secondary" onclick="selectDestinationFolder()" aria-label="Select Folder">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.05); width: 100%;">
+
+        <div class="form-group">
+          <span class="label">Video Download</span>
+          <select id="videoFormat" style="margin-bottom: 12px;">
+            <option value="">Video Format...</option>
+          </select>
+          <button class="btn-primary" id="btnDownloadVideo" onclick="executeVideoDownload()">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Download Video
+          </button>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.05); width: 100%;">
+
+        <div class="form-group">
+          <span class="label">Subtitle Download</span>
+          <div class="form-row" style="margin-bottom: 12px;">
+            <select id="subLang">
+              <option value="">Language...</option>
+            </select>
+            <select id="subFormat" style="flex: 0.5;">
+              <option value="vtt">VTT</option>
+              <option value="srt">SRT</option>
+              <option value="ass">ASS</option>
+              <option value="lrc">LRC</option>
+            </select>
+          </div>
+          <button class="btn-primary" id="btnDownloadSub" onclick="executeSubtitleDownload()">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Download Subtitle
+          </button>
+        </div>
+
+      </div>
+    </aside>
+
   </div>
 
-  <video id="vid" controls crossorigin="anonymous"></video>
+  <div class="toast-container" id="toastContainer"></div>
 
-  <script>
-    let mediaURL = "";
-
-    window.onload = function() {
-      window.go.main.App.GetMediaURL().then(url => {
-        mediaURL = url;
-      });
-    };
-
-    function selectVideo() {
-      window.go.main.App.SelectVideoFile().then(path => {
-        if (path) {
-          const vid = document.getElementById('vid');
-
-          vid.src = mediaURL + '/video?t=' + Date.now();
-          vid.play();
-        }
-      });
-    }
-
-    function selectVTT() {
-      window.go.main.App.SelectVTTFile().then(path => {
-        if (path) {
-          const vid = document.getElementById('vid');
-                    const oldTracks = vid.querySelectorAll('track');
-          oldTracks.forEach(t => t.remove());
-
-          const track = document.createElement('track');
-          track.kind = 'subtitles';
-          track.label = 'Legenda';
-          track.srclang = 'en';
-          track.src = mediaURL + '/vtt?t=' + Date.now();
-          track.default = true;
-
-          vid.appendChild(track);
-
-          const currentTime = vid.currentTime;
-          vid.currentTime = currentTime + 0.001;
-        }
-      });
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
