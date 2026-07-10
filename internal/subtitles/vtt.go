@@ -1,4 +1,4 @@
-package utils
+package subtitles
 
 import (
 	"encoding/json"

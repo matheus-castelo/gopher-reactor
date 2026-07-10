@@ -10,7 +10,7 @@ import (
 	"sync"
 
 	"ytdlp/internal/downloader"
-	utils "ytdlp/internal/subtitles"
+	"ytdlp/internal/subtitles"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -63,7 +63,7 @@ func (a *App) LoadSubtitle() string {
 	if err != nil || selection == "" {
 		return "[]"
 	}
-	return utils.ParseSubtitleToJSON(selection)
+	return subtitles.ParseSubtitleToJSON(selection)
 }
 
 func (a *App) startMediaServer() {
@@ -110,18 +110,20 @@ func (a *App) FetchAvailableFormats(url string) ([]downloader.FormatOption, erro
 }
 
 type ProgressData struct {
-	ID      string  `json:"id"`
-	Type    string  `json:"type"`
-	Percent float64 `json:"percent"`
-	Status  string  `json:"status"`
+	ID       string  `json:"id"`
+	Type     string  `json:"type"`
+	Percent  float64 `json:"percent"`
+	Status   string  `json:"status"`
+	Filename string  `json:"filename"`
 }
 
 func (a *App) emitProgress(id string, pType string, percent float64, status string, filename string) {
 	runtime.EventsEmit(a.ctx, "download:progress", ProgressData{
-		ID:      id,
-		Type:    pType,
-		Percent: percent,
-		Status:  status,
+		ID:       id,
+		Type:     pType,
+		Percent:  percent,
+		Status:   status,
+		Filename: filename,
 	})
 }
 
