@@ -32,7 +32,6 @@ coverage.txt
 *.m4a
 *.webm
 *.pcode
-subtitles*
 
 .DS_Store
 Thumbs.db
