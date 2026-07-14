@@ -30,6 +30,10 @@ export function GetMediaURL() {
   return window['go']['app']['App']['GetMediaURL']();
 }
 
+export function HasWhisper() {
+  return window['go']['app']['App']['HasWhisper']();
+}
+
 export function LoadSubtitle() {
   return window['go']['app']['App']['LoadSubtitle']();
 }
@@ -40,6 +44,10 @@ export function SelectDirectory() {
 
 export function SelectVideoFile() {
   return window['go']['app']['App']['SelectVideoFile']();
+}
+
+export function SpeakEdgeTTS(arg1, arg2) {
+  return window['go']['app']['App']['SpeakEdgeTTS'](arg1, arg2);
 }
 
 export function ValidateURL(arg1) {

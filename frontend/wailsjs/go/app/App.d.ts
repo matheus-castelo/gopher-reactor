@@ -16,10 +16,14 @@ export function FetchAvailableSubtitles(arg1:string):Promise<Array<downloader.Su
 
 export function GetMediaURL():Promise<string>;
 
+export function HasWhisper():Promise<boolean>;
+
 export function LoadSubtitle():Promise<string>;
 
 export function SelectDirectory():Promise<string>;
 
 export function SelectVideoFile():Promise<string>;
+
+export function SpeakEdgeTTS(arg1:string,arg2:string):Promise<string>;
 
 export function ValidateURL(arg1:string):Promise<void>;

@@ -1,5 +1,4 @@
 package downloader
-
 import (
 	"context"
 	"encoding/json"
@@ -10,14 +9,16 @@ import (
 	"sort"
 	"strings"
 	"time"
-
 	"github.com/lrstanley/go-ytdlp"
 )
-
 var ytdlpReady bool
-
 type ProgressCallback func(percent float64, status string, filename string)
 
+func newYTDLP() *ytdlp.Command {
+	return ytdlp.New().
+		NoUpdate().
+		ExtractorArgs("youtube:player_client=ios,default")
+}
 func EnsureDependencies() error {
 	if ytdlpReady {
 		return nil
@@ -28,7 +29,6 @@ func EnsureDependencies() error {
 	ytdlpReady = true
 	return nil
 }
-
 func ValidateURL(videoURL string) error {
 	u, err := url.ParseRequestURI(videoURL)
 	if err != nil {
@@ -42,7 +42,6 @@ func ValidateURL(videoURL string) error {
 	}
 	return nil
 }
-
 func resolveDirectory(path string) (string, error) {
 	dir := path
 	if dir == "" {
@@ -58,14 +57,12 @@ func resolveDirectory(path string) (string, error) {
 	}
 	return dir, nil
 }
-
 func availableLanguages(url string) (map[string]bool, error) {
-	dl := ytdlp.New().DumpSingleJSON().SkipDownload().NoWarnings()
+	dl := newYTDLP().DumpSingleJSON().SkipDownload().NoWarnings()
 	res, err := dl.Run(context.Background(), url)
 	if err != nil {
 		return nil, fmt.Errorf("yt-dlp error: %w", err)
 	}
-
 	var info struct {
 		Subtitles         map[string]any `json:"subtitles"`
 		AutomaticCaptions map[string]any `json:"automatic_captions"`
@@ -73,7 +70,6 @@ func availableLanguages(url string) (map[string]bool, error) {
 	if err := json.Unmarshal([]byte(res.Stdout), &info); err != nil {
 		return nil, err
 	}
-
 	available := make(map[string]bool)
 	for lang := range info.Subtitles {
 		available[lang] = true
@@ -83,24 +79,20 @@ func availableLanguages(url string) (map[string]bool, error) {
 	}
 	return available, nil
 }
-
 type SubtitleOption struct {
 	Code  string `json:"code"`
 	Label string `json:"label"`
 	Auto  bool   `json:"auto"`
 }
-
 func FetchSubtitles(url string) ([]SubtitleOption, error) {
 	if err := EnsureDependencies(); err != nil {
 		return nil, err
 	}
-
-	dl := ytdlp.New().DumpSingleJSON().SkipDownload().NoWarnings()
+	dl := newYTDLP().DumpSingleJSON().SkipDownload().NoWarnings()
 	res, err := dl.Run(context.Background(), url)
 	if err != nil {
 		return nil, err
 	}
-
 	var info struct {
 		Subtitles         map[string]any `json:"subtitles"`
 		AutomaticCaptions map[string]any `json:"automatic_captions"`
@@ -108,43 +100,34 @@ func FetchSubtitles(url string) ([]SubtitleOption, error) {
 	if err := json.Unmarshal([]byte(res.Stdout), &info); err != nil {
 		return nil, err
 	}
-
 	var options []SubtitleOption
 	seen := make(map[string]bool)
-
 	for lang := range info.Subtitles {
 		options = append(options, SubtitleOption{Code: lang, Label: lang, Auto: false})
 		seen[lang] = true
 	}
-
 	for lang := range info.AutomaticCaptions {
 		if !seen[lang] {
 			options = append(options, SubtitleOption{Code: lang, Label: lang + " (auto)", Auto: true})
 		}
 	}
-
 	sort.Slice(options, func(i, j int) bool {
 		return options[i].Code < options[j].Code
 	})
-
 	return options, nil
 }
-
 func DownloadSubtitle(ctx context.Context, url string, language string, destPath string, cb ProgressCallback) error {
 	language = strings.TrimSpace(strings.Split(language, " ")[0])
 	if language == "" {
 		return fmt.Errorf("language not specified")
 	}
-
 	if err := EnsureDependencies(); err != nil {
 		return err
 	}
-
 	available, err := availableLanguages(url)
 	if err != nil {
 		return err
 	}
-
 	found := false
 	for lang := range available {
 		if lang == language || strings.HasPrefix(lang, language+"-") {
@@ -155,34 +138,28 @@ func DownloadSubtitle(ctx context.Context, url string, language string, destPath
 	if !found {
 		return fmt.Errorf("language '%s' not available", language)
 	}
-
 	dir, err := resolveDirectory(destPath)
 	if err != nil {
 		return err
 	}
-
 	before, _ := os.ReadDir(dir)
 	outputTemplate := filepath.Join(dir, "%(title)s.%(ext)s")
 	langQuery := language + ".*," + language
-
-	dl := ytdlp.New().
+	dl := newYTDLP().
 		SkipDownload().
 		WriteSubs().
 		WriteAutoSubs().
 		SubLangs(langQuery).
 		SubFormat("vtt").
 		Output(outputTemplate)
-
 	if cb != nil {
 		dl.ProgressFunc(time.Millisecond*500, func(update ytdlp.ProgressUpdate) {
 			cb(update.Percent(), string(update.Status), update.Filename)
 		})
 	}
-
 	if _, err := dl.Run(ctx, url); err != nil {
 		return err
 	}
-
 	after, _ := os.ReadDir(dir)
 	downloaded := false
 	for _, f := range after {
@@ -200,13 +177,11 @@ func DownloadSubtitle(ctx context.Context, url string, language string, destPath
 			downloaded = true
 		}
 	}
-
 	if !downloaded {
 		return fmt.Errorf("no subtitle found")
 	}
 	return nil
 }
-
 type FormatOption struct {
 	FormatID   string  `json:"format_id"`
 	Extension  string  `json:"ext"`
@@ -217,18 +192,15 @@ type FormatOption struct {
 	TBR        float64 `json:"tbr"`
 	AudioOnly  bool    `json:"audio_only"`
 }
-
 func FetchFormats(url string) ([]FormatOption, error) {
 	if err := EnsureDependencies(); err != nil {
 		return nil, err
 	}
-
-	dl := ytdlp.New().DumpSingleJSON().SkipDownload().NoWarnings()
+	dl := newYTDLP().DumpSingleJSON().SkipDownload().NoWarnings()
 	res, err := dl.Run(context.Background(), url)
 	if err != nil {
 		return nil, err
 	}
-
 	var info struct {
 		Formats []struct {
 			FormatID       string   `json:"format_id"`
@@ -244,11 +216,9 @@ func FetchFormats(url string) ([]FormatOption, error) {
 			FileSizeApprox *int     `json:"filesize_approx"`
 		} `json:"formats"`
 	}
-
 	if err := json.Unmarshal([]byte(res.Stdout), &info); err != nil {
 		return nil, err
 	}
-
 	var options []FormatOption
 	for _, f := range info.Formats {
 		resolution := f.Resolution
@@ -259,7 +229,6 @@ func FetchFormats(url string) ([]FormatOption, error) {
 				resolution = "audio only"
 			}
 		}
-
 		codec := ""
 		if f.VCodec != "" && f.VCodec != "none" {
 			codec = f.VCodec
@@ -271,9 +240,7 @@ func FetchFormats(url string) ([]FormatOption, error) {
 				codec = f.ACodec
 			}
 		}
-
 		audioOnly := (f.VCodec == "" || f.VCodec == "none") && (f.ACodec != "" && f.ACodec != "none")
-
 		size := ""
 		bytes := 0
 		if f.FileSize != nil && *f.FileSize > 0 {
@@ -289,7 +256,6 @@ func FetchFormats(url string) ([]FormatOption, error) {
 				size = fmt.Sprintf("%.1f MiB", mb)
 			}
 		}
-
 		options = append(options, FormatOption{
 			FormatID:   f.FormatID,
 			Extension:  f.Ext,
@@ -303,57 +269,46 @@ func FetchFormats(url string) ([]FormatOption, error) {
 	}
 	return options, nil
 }
-
 func DownloadVideo(ctx context.Context, url string, destPath string, cb ProgressCallback) error {
 	if err := EnsureDependencies(); err != nil {
 		return err
 	}
-
 	dir, err := resolveDirectory(destPath)
 	if err != nil {
 		return err
 	}
-
 	outputTemplate := filepath.Join(dir, "%(extractor)s - %(title)s.%(ext)s")
-	dl := ytdlp.New().FormatSort("res,ext:mp4:m4a").RecodeVideo("mp4").Output(outputTemplate)
-
+	dl := newYTDLP().FormatSort("res,ext:mp4:m4a").RecodeVideo("mp4").Output(outputTemplate)
 	if cb != nil {
 		dl.ProgressFunc(time.Millisecond*500, func(update ytdlp.ProgressUpdate) {
 			cb(update.Percent(), string(update.Status), update.Filename)
 		})
 	}
-
 	if _, err := dl.Run(ctx, url); err != nil {
 		return err
 	}
 	return nil
 }
-
 func DownloadVideoWithFormat(ctx context.Context, url string, formatID string, destPath string, cb ProgressCallback) error {
 	if err := EnsureDependencies(); err != nil {
 		return err
 	}
-
 	dir, err := resolveDirectory(destPath)
 	if err != nil {
 		return err
 	}
-
 	outputTemplate := filepath.Join(dir, "%(extractor)s - %(title)s.%(ext)s")
-	dl := ytdlp.New().Format(formatID).Output(outputTemplate)
-
+	dl := newYTDLP().Format(formatID).Output(outputTemplate)
 	if cb != nil {
 		dl.ProgressFunc(time.Millisecond*500, func(update ytdlp.ProgressUpdate) {
 			cb(update.Percent(), string(update.Status), update.Filename)
 		})
 	}
-
 	if _, err := dl.Run(ctx, url); err != nil {
 		return err
 	}
 	return nil
 }
-
 func DownloadSubtitleWithFormat(ctx context.Context, url string, language string, subtitleFormat string, destPath string, cb ProgressCallback) error {
 	language = strings.TrimSpace(strings.Split(language, " ")[0])
 	if language == "" {
@@ -363,16 +318,13 @@ func DownloadSubtitleWithFormat(ctx context.Context, url string, language string
 		subtitleFormat = "vtt"
 	}
 	subtitleFormat = strings.TrimSpace(strings.ToLower(subtitleFormat))
-
 	if err := EnsureDependencies(); err != nil {
 		return err
 	}
-
 	available, err := availableLanguages(url)
 	if err != nil {
 		return err
 	}
-
 	found := false
 	for lang := range available {
 		if lang == language || strings.HasPrefix(lang, language+"-") {
@@ -383,34 +335,28 @@ func DownloadSubtitleWithFormat(ctx context.Context, url string, language string
 	if !found {
 		return fmt.Errorf("language '%s' not available", language)
 	}
-
 	dir, err := resolveDirectory(destPath)
 	if err != nil {
 		return err
 	}
-
 	before, _ := os.ReadDir(dir)
 	outputTemplate := filepath.Join(dir, "%(title)s.%(ext)s")
 	langQuery := language + ".*," + language
-
-	dl := ytdlp.New().
+	dl := newYTDLP().
 		SkipDownload().
 		WriteSubs().
 		WriteAutoSubs().
 		SubLangs(langQuery).
 		SubFormat(subtitleFormat).
 		Output(outputTemplate)
-
 	if cb != nil {
 		dl.ProgressFunc(time.Millisecond*500, func(update ytdlp.ProgressUpdate) {
 			cb(update.Percent(), string(update.Status), update.Filename)
 		})
 	}
-
 	if _, err := dl.Run(ctx, url); err != nil {
 		return err
 	}
-
 	after, _ := os.ReadDir(dir)
 	downloaded := false
 	for _, f := range after {
@@ -425,7 +371,6 @@ func DownloadSubtitleWithFormat(ctx context.Context, url string, language string
 			downloaded = true
 		}
 	}
-
 	if !downloaded {
 		return fmt.Errorf("no subtitle found")
 	}

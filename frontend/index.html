@@ -6,87 +6,205 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
   <div class="app-container">
-    
     <main class="main-content" id="mainContent">
       <div class="topbar">
         <div></div>
         <div class="topbar-actions">
+          <button class="btn-secondary" onclick="togglePracticeModeGlobal()" id="btnGlobalPractice">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+              <line x1="12" y1="19" x2="12" y2="23"></line>
+              <line x1="8" y1="23" x2="16" y2="23"></line>
+            </svg>
+            Practice Mode
+          </button>
           <button class="btn-secondary" onclick="selectVideo()">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><polygon points="10 9 15 13 10 17 10 9"></polygon></svg>
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <polygon points="10 9 15 13 10 17 10 9"></polygon>
+            </svg>
             Open Video
           </button>
           <button class="btn-secondary" onclick="selectSubtitle()">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
             Open Subtitle
           </button>
           <button class="btn-secondary" onclick="toggleDrawer()" aria-label="Toggle Download Drawer">
-            <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
             Download
+          </button>
+          <button class="btn-secondary" onclick="toggleSettingsModal()" aria-label="Settings">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
           </button>
         </div>
       </div>
-
       <div class="player-container">
         <video id="vid" controls crossorigin="anonymous"></video>
-        
         <div class="sync-overlay">
           <button class="btn-icon" onclick="adjustSync(-0.1)" aria-label="Decrease Sync">
-            <svg class="icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <svg class="icon" viewBox="0 0 24 24">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
           </button>
           <input type="number" id="syncInput" class="sync-input" step="0.1" value="0.00">
           <button class="btn-icon" onclick="adjustSync(0.1)" aria-label="Increase Sync">
-            <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <svg class="icon" viewBox="0 0 24 24">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
           </button>
         </div>
-
         <div class="subtitles-overlay">
           <div id="custom-subtitles"></div>
         </div>
+        <div id="listening-indicator" class="listening-indicator" style="display: none;">
+          <svg class="icon-pulse" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="22"></line>
+          </svg>
+          <div id="listening-text" class="word-container">Listening...</div>
+          <div class="practice-header">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            </svg>
+            <span>Speak this phrase:</span>
+          </div>
+          <div id="listening-target-text" class="target-phrase"></div>
+          <div class="practice-divider"></div>
+          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div id="listening-spoken-text" class="word-container" style="margin: 0;">Waiting for audio...</div>
+            <div id="pronunciation-score" style="font-weight: bold; font-size: 1.2em; color: var(--accent); padding-left: 15px;"></div>
+          </div>
+          <div class="practice-controls-row">
+            <button class="btn-secondary" onclick="window.resetPractice()" id="btnReset" title="Reset Practice">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                <polyline points="3 3 3 8 8 8"></polyline>
+              </svg>
+              Reset
+            </button>
+            <button class="btn-secondary" onclick="backPracticePhrase()" id="btnBack" title="Previous Subtitle">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="19 20 9 12 19 4 19 20"></polygon>
+                <line x1="5" y1="19" x2="5" y2="5"></line>
+              </svg>
+              Back
+            </button>
+            <button class="btn-secondary" onclick="replayPracticePhrase()" id="btnReplay" title="Replay Video">
+              <svg class="icon" viewBox="0 0 24 24">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                <polyline points="3 3 3 8 8 8"></polyline>
+              </svg>
+              Replay
+            </button>
+            <button class="btn-secondary" onclick="window.speakPracticePhrase()" id="btnListen" title="Listen (TTS)">
+              <svg class="icon" viewBox="0 0 24 24">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+              </svg>
+              TTS
+            </button>
+            <div class="select-wrapper" style="max-width: 160px; display: none;" id="speakerWrapper">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+                <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
+              </svg>
+              <select id="speakerSelect" title="Select Headphone">
+                <option value="">Default Speaker</option>
+              </select>
+            </div>
+            <div class="select-wrapper" style="max-width: 160px; display: none;" id="micWrapper">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="23"></line>
+                <line x1="8" y1="23" x2="16" y2="23"></line>
+              </svg>
+              <select id="micSelect" title="Select Microphone">
+                <option value="">Default Mic</option>
+              </select>
+            </div>
+            <button class="btn-primary" onclick="toggleRecord()" id="btnRecord" title="Record">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="23"></line>
+                <line x1="8" y1="23" x2="16" y2="23"></line>
+              </svg>
+              Record
+            </button>
+            <button class="btn-secondary btn-skip" onclick="skipPractice()">
+              Skip
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="5 4 15 12 5 20 5 4"></polygon>
+                <line x1="19" y1="5" x2="19" y2="19"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
     </main>
-
     <aside class="drawer" id="sideDrawer">
       <div class="drawer-header">
         <h2>Download Media</h2>
         <button class="btn-icon" onclick="toggleDrawer()" aria-label="Close Drawer">
-          <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          <svg class="icon" viewBox="0 0 24 24">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
         </button>
       </div>
-
       <div class="drawer-content">
-        
         <div class="form-group">
           <span class="label">Source URL</span>
           <input type="text" id="videoUrl" placeholder="YouTube Video URL...">
         </div>
-
         <div class="form-group" style="gap: 16px;">
           <span class="label">Destination Folder</span>
           <div class="input-with-btn">
             <input type="text" id="destPath" placeholder="Default (current directory)">
             <button class="btn-secondary" onclick="selectDestinationFolder()" aria-label="Select Folder">
-              <svg class="icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+              <svg class="icon" viewBox="0 0 24 24">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+              </svg>
             </button>
           </div>
         </div>
-
         <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.05); width: 100%;">
-
         <div class="form-group">
           <span class="label">Video Download</span>
           <select id="videoFormat" style="margin-bottom: 12px;">
             <option value="">Video Format...</option>
           </select>
           <button class="btn-primary" id="btnDownloadVideo" onclick="executeVideoDownload()">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
             Download Video
           </button>
         </div>
-
         <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.05); width: 100%;">
-
         <div class="form-group">
           <span class="label">Subtitle Download</span>
           <div class="form-row" style="margin-bottom: 12px;">
@@ -101,18 +219,104 @@
             </select>
           </div>
           <button class="btn-primary" id="btnDownloadSub" onclick="executeSubtitleDownload()">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
             Download Subtitle
           </button>
         </div>
-
       </div>
     </aside>
-
+  </div>
+  <div class="toast-container" id="toastContainer"></div>
+  
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Settings</h2>
+        <button class="btn-icon" onclick="toggleSettingsModal()" aria-label="Close Settings">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: 16px;">
+        <div class="form-group">
+          <span class="label">Lite TTS Engine</span>
+          <select id="ttsModeSelect" onchange="updateTTSMode()" style="width: 100%; padding: 8px;">
+            <option value="edge">Edge TTS (Microsoft Neural)</option>
+            <option value="web">Web Speech API (Browser Default)</option>
+          </select>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="toast-container" id="toastContainer"></div>
-
+  <script>
+    const originalFetch = window.fetch;
+    window.fetch = async function() {
+      let url = arguments[0];
+      if (typeof url === 'string' && url.includes('huggingface.co')) {
+        if (url.includes('onnx-community/Kokoro-82M-v1.0-ONNX')) {
+          url = url.replace('https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX/resolve/main/', '/models/kokoro/resolve/main/');
+          arguments[0] = url;
+        }
+      }
+      if (arguments[0] instanceof Request && arguments[0].url.includes('huggingface.co')) {
+         if (arguments[0].url.includes('onnx-community/Kokoro-82M-v1.0-ONNX')) {
+            let newUrl = arguments[0].url.replace('https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX/resolve/main/', '/models/kokoro/resolve/main/');
+            arguments[0] = new Request(newUrl, arguments[0]);
+         }
+      }
+      return originalFetch.apply(this, arguments);
+    };
+  </script>
+  <script type="module">
+    let ttsPipeline = null;
+    let audioContext = null;
+    try {
+        const { KokoroTTS } = await import('./libs/kokoro.web.min.js');
+        window.speakTextKokoro = async function (text, onEndedCallback) {
+          if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          }
+          if (!ttsPipeline) {
+            try {
+              ttsPipeline = await KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX', {
+                dtype: 'q8'
+              });
+            } catch (err) {
+              console.error("Failed to load TTS model:", err);
+              if (window.showToast) window.showToast("TTS Error", err.message || err.toString(), "error");
+              return;
+            }
+          }
+          try {
+            const result = await ttsPipeline.generate(text, {
+              voice: 'af_heart'
+            });
+            const audioBuffer = audioContext.createBuffer(1, result.audio.length, result.sampling_rate);
+            audioBuffer.copyToChannel(result.audio, 0);
+            const source = audioContext.createBufferSource();
+            source.buffer = audioBuffer;
+            source.connect(audioContext.destination);
+            if (onEndedCallback) {
+              source.onended = onEndedCallback;
+            }
+            source.start();
+          } catch (e) {
+            console.error("TTS generation error:", e);
+            if (window.showToast) window.showToast("TTS Error", e.message || e.toString(), "error");
+          }
+        };
+    } catch (err) {
+        console.log("Kokoro TTS is disabled in this build.");
+    }
+  </script>
   <script src="script.js"></script>
 </body>
 </html>
